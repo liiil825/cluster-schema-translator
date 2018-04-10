@@ -1,0 +1,58 @@
+{
+  "name": "cluster-schema-translator",
+  "version": "0.1.0",
+  "description": "A qingcloud cluster schema translator",
+  "main": "lib/index.js",
+  "module": "src/index.js",
+  "bin": {
+    "qc-cl": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "build": "babel src -d lib",
+    "precommit": "prettier",
+    "demo": "qc-cl -s xLCzIOXoJ6dwLdZIf6WROcir3dpvZNKT -t JVe7bc0tGh20nibp2HFkKb3tqxT7Xnj3 ca-mr1tku3o -d",
+    "clean": "rimraf test/fixture/ca-*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iwisunny/cluster-schema-translator.git"
+  },
+  "keywords": [
+    "qingcloud",
+    "cluster",
+    "json schema",
+    "mustache",
+    "toml",
+    "translator"
+  ],
+  "author": "iwisunny",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iwisunny/cluster-schema-translator/issues"
+  },
+  "homepage": "https://github.com/iwisunny/cluster-schema-translator#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.18.2",
+    "prettier": "^1.11.1",
+    "rollup": "^0.57.0",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-node-resolve": "^3.3.0"
+  },
+  "engines": {
+    "node": ">=4.8"
+  },
+  "dependencies": {
+    "commander": "^2.15.1",
+    "jest": "^22.4.3",
+    "rimraf": "^2.6.2",
+    "superagent": "^3.8.2",
+    "underscore": "^1.8.3"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  }
+}
