@@ -15,15 +15,22 @@ qc-cl --help
 ```
 
 ## 3. Testing
+
+First you should setup testing fixture
+```
+npm run setup
+```
+
+Then
 ```
 npm test
 ```
 
-### 4. Gaols
+### 4. Goals
 
-- [] Support format like: mustache, json, toml
-- [] Generate form view component capable in React
-- [] Ship with a `cli` tool to manipulate text schema files
+- [x] Support format like: mustache, json, toml
+- [x] Ship with a `cli` tool to manipulate schema files
+- [ ] Generate form view component capable in React
 
 
 ### License

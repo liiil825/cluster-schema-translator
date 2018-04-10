@@ -8,11 +8,12 @@
     "qc-cl": "./src/cli.js"
   },
   "scripts": {
-    "test": "jest",
-    "build": "babel src -d lib",
-    "precommit": "prettier",
-    "demo": "qc-cl -s xLCzIOXoJ6dwLdZIf6WROcir3dpvZNKT -t JVe7bc0tGh20nibp2HFkKb3tqxT7Xnj3 ca-mr1tku3o -d",
-    "clean": "rimraf test/fixture/ca-*"
+    "test": "BABEL_ENV=testing jest -c jest.config.json",
+    "build": "babel src -d lib && rollup -c",
+    "precommit": "prettier '{src,test}/**/*.js' --write",
+    "setup": "npm run clean && node src/setup.js",
+    "clean": "rimraf test/fixture/*.json.mustache",
+    "lint": "eslint src test"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,7 @@
     "toml",
     "translator"
   ],
-  "author": "iwisunny",
+  "author": "sunnyw",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/iwisunny/cluster-schema-translator/issues"
@@ -36,6 +37,7 @@
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "eslint": "^4.18.2",
+    "jest": "^22.4.3",
     "prettier": "^1.11.1",
     "rollup": "^0.57.0",
     "rollup-plugin-babel": "^3.0.3",
@@ -46,13 +48,9 @@
   },
   "dependencies": {
     "commander": "^2.15.1",
-    "jest": "^22.4.3",
+    "js-yaml": "^3.11.0",
     "rimraf": "^2.6.2",
     "superagent": "^3.8.2",
     "underscore": "^1.8.3"
-  },
-  "directories": {
-    "lib": "lib",
-    "test": "test"
   }
 }

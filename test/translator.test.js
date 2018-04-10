@@ -1,23 +1,40 @@
-const fs=require('fs');
-const path=require('path');
+const fs = require('fs');
+const path = require('path');
 
-const Translator=require('../lib/index').default;
+const Translator = require('../src/index').default;
 
-describe('Translator', ()=> {
-  it('read test dir', ()=>{
-    const baseDir=path.resolve('test/fixture')
-    fs.readdir(baseDir, (err, files)=> {
-      if(err){
-        throw err;
-      }
-      files.forEach(file=> {
-        if(path.extname(file) === 'mustache'){
-          let file_cont=fs.readFileSync(path.join(baseDir, file));
-          let trans=new Translator(file_cont);
-          expect(trans.toJson()).not.toThrow();
+describe('Translator', () => {
+  const baseDir = path.resolve('test/fixture');
+
+  const readFiles = () => {
+    return new Promise((resolve, reject) => {
+      fs.readdir(baseDir, (err, files) => {
+        if (err) {
+          reject(err);
         }
-      })
-    })
-  });
 
+        const caFiles = files.filter(file => {
+          return path.extname(file) === '.mustache';
+        });
+
+        resolve(caFiles);
+      });
+    });
+  };
+
+  it('toJson', () => {
+    return readFiles()
+      .then(files => {
+        expect.assertions(files.length);
+
+        files.forEach(file => {
+          const mustache = fs.readFileSync(path.join(baseDir, file), {encoding: 'utf8'});
+          const trans = new Translator(mustache);
+          expect(trans.toJson.bind(trans)).not.toThrow();
+        });
+      })
+      .catch(err => {
+        expect(err).toMatch('invalid mustache');
+      });
+  });
 });

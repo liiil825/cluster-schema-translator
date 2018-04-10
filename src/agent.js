@@ -3,10 +3,11 @@
  */
 const request = require('superagent');
 const _ = require('underscore');
-const describe=require('./Describe');
+const describe = require('./Describe');
 
-const userAgent = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko)\
- Chrome/65.0.3325.181 Safari/537.36`;
+const userAgent =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko)\
+ Chrome/65.0.3325.181 Safari/537.36';
 
 const header = {
   Accept: 'application/json, */*; q=0.8',
@@ -21,6 +22,7 @@ const header = {
 const requiredKeys = ['sk', 'token', 'query'];
 const queryTypes = ['ca', 'app', 'appv'];
 const defaultHost = 'console.alphacloud.com';
+const defaultZone = 'test';
 
 class Agent {
   constructor(host, params = {}) {
@@ -30,7 +32,7 @@ class Agent {
     }
 
     if (typeof host !== 'string') {
-      throw Error('host should be string, ' + (typeof host) + ' given');
+      throw Error('host should be string, ' + typeof host + ' given');
     }
 
     if (!Agent.validateParams(params)) {
@@ -38,28 +40,28 @@ class Agent {
     }
 
     this.host = host || defaultHost;
-    this.zone = params.zone || 'test';
+    this.zone = params.zone || defaultZone;
     this.debug = params.debug || false;
     this.params = _.pick(params, requiredKeys);
     // for shortcut, eg: `this.token`
-    for(let p in this.params){
-      if(this.params.hasOwnProperty(p)){
+    for (let p in this.params) {
+      if (this.params.hasOwnProperty(p)) {
         this[p] = this.params[p];
       }
     }
     this.setQueryType();
   }
 
-  setQueryType(){
+  setQueryType() {
     let matchQuery = this.query.match(/^(ca|app|appv)-\w+$/i);
     // special case: all
-    if(this.query === 'all'){
+    if (this.query === 'all') {
       this.queryType = 'ca';
-      this.ca='';
+      this.ca = '';
       return;
     }
 
-    if(matchQuery && _.contains(queryTypes, matchQuery[1])){
+    if (matchQuery && _.contains(queryTypes, matchQuery[1])) {
       this.queryType = matchQuery[1];
     } else {
       throw Error('invalid query type');
@@ -71,26 +73,25 @@ class Agent {
     return _.intersection(_.keys(params), requiredKeys).length === requiredKeys.length;
   }
 
-  static instance(){
+  static instance() {
     return new Agent(...arguments);
   }
 
   getRequestUrl() {
-    let normalize_host = this.host.endsWith('/') ? this.host.substring(0, this.host.lastIndexOf('/')) : this.host;
+    let normalize_host = this.host.endsWith('/')
+      ? this.host.substring(0, this.host.lastIndexOf('/'))
+      : this.host;
     if (normalize_host.startsWith('http')) {
       normalize_host = normalize_host.replace(/https?:\/\//, '');
     }
-    return (this.zone === 'test' ? 'http' : 'https') + '://' + normalize_host + '/api/';
+    return (this.zone === defaultZone ? 'http' : 'https') + '://' + normalize_host + '/api/';
   }
 
   getHeader() {
     return _.extend({}, header, {
-      Cookie: [
-        'csrftoken=' + this.token,
-        'zone=' + this.zone,
-        'lang=zh-cn',
-        'sk=' + this.sk
-      ].join('; '),
+      Cookie: ['csrftoken=' + this.token, 'zone=' + this.zone, 'lang=zh-cn', 'sk=' + this.sk].join(
+        '; '
+      ),
       'X-CSRFToken': this.token
     });
   }
@@ -103,26 +104,26 @@ class Agent {
     let reqUrl = this.getRequestUrl(),
       reqHeader = this.getHeader();
 
-    if(this.debug){
+    if (this.debug) {
       this.info('request url: ', reqUrl);
       this.info('request header: ', JSON.stringify(reqHeader));
     }
 
-    let req=request
+    let req = request
       .post(reqUrl)
       .timeout({
-        response: this.query === 'all' ? 10000 : 5000
+        response: this.query === 'all' ? 20000 : 10000
       })
       .set(reqHeader);
 
     // fallback callback
     if (typeof cb !== 'function') {
-      cb = (res) => {
+      cb = res => {
         console.log('attachment set: ', res);
-      }
+      };
     }
 
-    let fetchAttachment = (reqBody)=> {
+    let fetchAttachment = reqBody => {
       req
         .send('params=' + JSON.stringify(reqBody))
         .then(res => {
@@ -137,16 +138,14 @@ class Agent {
         });
     };
 
-    if(this.queryType === 'ca'){
+    if (this.queryType === 'ca') {
       let reqBody = describe.attachment.getQueryParams({zone: this.zone, ca: this.ca});
       this.debug && this.info('request params: ', JSON.stringify(reqBody), '\n');
       fetchAttachment(reqBody);
-    }
-    else {
+    } else {
       let describeModule = this.queryType === 'appv' ? describe.appVer : describe.app;
       describeModule.fetch(req, fetchAttachment);
     }
-
   }
 }
 

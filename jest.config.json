@@ -1,5 +1,9 @@
 {
   "bail": true,
+  "verbose": true,
   "testRegex": ".*\\.test\\.js$",
-  "transform": {}
+  "testEnvironment": "node",
+  "transform": {
+    "^.+\\.jsx?$": "babel-jest"
+  }
 }
