@@ -5,7 +5,7 @@ export default {
   input: "src/index.js",
   output: {
     name: "ClusterSchemaTranslator",
-    file: "dist/bundle.js",
+    file: "lib/index.js",
     format: "umd"
   },
   plugins: [babel()]

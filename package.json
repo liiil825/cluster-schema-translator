@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "BABEL_ENV=testing jest -c jest.config.json",
-    "build": "babel src -d lib && rollup -c",
+    "build": "rollup -c",
+    "need-pretty": "prettier '{src,test}/**/*.js' -l",
     "precommit": "prettier '{src,test}/**/*.js' --write",
     "setup": "npm run clean && node src/setup.js",
     "clean": "rimraf test/fixture/*.json.mustache",
@@ -39,6 +40,7 @@
     "eslint": "^4.18.2",
     "jest": "^22.4.3",
     "prettier": "^1.11.1",
+    "rimraf": "^2.6.2",
     "rollup": "^0.57.0",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-node-resolve": "^3.3.0"
@@ -49,7 +51,6 @@
   "dependencies": {
     "commander": "^2.15.1",
     "js-yaml": "^3.11.0",
-    "rimraf": "^2.6.2",
     "superagent": "^3.8.2",
     "underscore": "^1.8.3"
   }
