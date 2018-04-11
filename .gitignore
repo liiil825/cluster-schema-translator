@@ -4,9 +4,6 @@ coverage/
 test/fixture/
 !test/fixture/.gitkeep
 
-dist/
-lib/
-
 yarn-error.log
 
 /env.*yml

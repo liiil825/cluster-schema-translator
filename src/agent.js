@@ -20,6 +20,7 @@ const header = {
 };
 
 const requiredKeys = ['sk', 'token', 'query'];
+const optionalKeys = ['offset', 'limit'];
 const queryTypes = ['ca', 'app', 'appv'];
 const defaultHost = 'console.alphacloud.com';
 const defaultZone = 'test';
@@ -42,13 +43,15 @@ class Agent {
     this.host = host || defaultHost;
     this.zone = params.zone || defaultZone;
     this.debug = params.debug || false;
-    this.params = _.pick(params, requiredKeys);
+    this.params = _.pick(params, _.union(requiredKeys, optionalKeys));
     // for shortcut, eg: `this.token`
     for (let p in this.params) {
       if (this.params.hasOwnProperty(p)) {
         this[p] = this.params[p];
       }
     }
+    this.sk = this.sk || 'x'; // fix csrftoken empty
+    this.token = this.token || 'x';
     this.setQueryType();
   }
 
@@ -132,14 +135,16 @@ class Agent {
         })
         .catch(err => {
           if (err.timeout) {
-            console.log('request timeout');
+            console.error('request timeout');
           }
-          console.error('err occurred: ', err);
+          console.error('error occurred: ', err.stack);
+          // @see: https://github.com/visionmedia/superagent/issues/1344
+          req.abort(); // end stuck promise
         });
     };
 
     if (this.queryType === 'ca') {
-      let reqBody = describe.attachment.getQueryParams({zone: this.zone, ca: this.ca});
+      let reqBody = describe.attachment.getQueryParams(_.pick(this, ['zone', 'ca', 'limit']));
       this.debug && this.info('request params: ', JSON.stringify(reqBody), '\n');
       fetchAttachment(reqBody);
     } else {

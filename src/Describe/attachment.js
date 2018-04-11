@@ -1,7 +1,12 @@
 module.exports = {
   action: 'DescribeCommonAttachments',
   getQueryParams: function(options) {
-    let limit = options.ca ? 50 : 100;
+    let limit;
+    if (options.limit) {
+      limit = options.limit;
+    } else {
+      limit = options.ca ? 50 : 100;
+    }
     let attachment_ids = options.ca ? [options.ca] : [];
 
     return {

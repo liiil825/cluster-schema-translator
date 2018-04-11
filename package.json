@@ -11,7 +11,7 @@
     "test": "BABEL_ENV=testing jest -c jest.config.json",
     "build": "rollup -c",
     "need-pretty": "prettier '{src,test}/**/*.js' -l",
-    "precommit": "prettier '{src,test}/**/*.js' --write",
+    "pretty": "prettier '{src,test}/**/*.js' --write",
     "setup": "npm run clean && node src/setup.js",
     "clean": "rimraf test/fixture/*.json.mustache",
     "lint": "eslint src test"

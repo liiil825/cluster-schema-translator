@@ -3,51 +3,118 @@
 const program = require('commander');
 const _ = require('underscore');
 const pkg = require('../package.json');
+const utils = require('./utils');
 
 const binName = _.keys(pkg.bin)[0];
 const pkgVer = pkg.version;
 
-const showMsg = (...msg) => console.log(...msg);
+const showMsg = (...msg) => console.log('[DEBUG]', ...msg);
 
 program
   .version(pkgVer, '-v , --version')
-  .description('A qingcloud cluster schema json translator')
-  .option('-s, --sk <sk>', 'secret key')
-  .option('-t, --token <token>', 'access token')
+  .description('A qingcloud cluster schema translator')
+  .option('-s, --sk [sk]', 'secret key')
+  .option('-t, --token [token]', 'access token')
+  .option('-c, --count [count]', 'limit result count')
   .option('-d, --debug', 'verbose mode');
 
 program.on('--help', () => {
-  console.log(`\n  Examples:
-        $ ${binName} --sk <sk> --token <token> <attachmentId |appId |appVer>
+  console.log(`
+  Commands:
+  
+    fetch [id]           fetch cluster schema based on attachment id, default: all
+    trans <id>           translate cluster schema to json
+    view <id>            generate view component (jsx syntax) based on schema id
+    
+  Examples:
+      $ ${binName} fetch
+      $ ${binName} fetch ca-xxx (find in test/fixture)
+      $ ${binName} trans ca-xxx
+      $ ${binName} trans <path/to/schema-file>
+      $ ${binName} view  ca-xxx
+      $ ${binName} view  <path/to/schema-file>
     `);
 });
 
-program.arguments('<query>').action(query => {
-  const debug = !!program.debug;
+const envConfig = utils.getEnvConfig();
+const acceptCmds = ['fetch', 'trans', 'view'];
 
-  // validate arguments
-  if (!query) {
-    console.error('no query given');
+const actions = {
+  fetch: function(id) {
+    const debug = !!program.debug;
+    id = id || 'all';
+
+    // validate arguments
+    if (id !== 'all' && !id.match(/^ca-/)) {
+      // describe attachment is excluded in api list
+      if (!program.sk) {
+        console.error('no sk given');
+        process.exit(1);
+      }
+      if (!program.token) {
+        console.error('no token given');
+        process.exit(1);
+      }
+    }
+
+    debug && showMsg('fetch query: ', id);
+
+    try {
+      const agent = require('./agent').instance({
+        query: id,
+        debug: debug,
+        sk: program.sk || envConfig.sk,
+        token: program.token || envConfig.token,
+        limit: isNaN(Number(program.count)) ? 1 : Number(program.count)
+      });
+
+      utils
+        .runAgent(agent, false)
+        .then(countRead => console.log('get ', countRead, ' schema file(s)'));
+    } catch (e) {
+      console.error(e.message);
+      process.exit(1);
+    }
+  },
+  trans: function(id) {
+    if (!id) {
+      console.error('Missing param <id>, exec: qc-cl trans <id>');
+      process.exit(1);
+    }
+
+    // todo
+    console.log('working on..');
+  },
+  view: function(id) {
+    if (!id) {
+      console.error('Missing param <id>, exec: qc-cl view <id>');
+      process.exit(1);
+    }
+
+    // todo
+    console.log('working on..');
+  }
+};
+
+program.arguments('<cmd> [param]').action((cmd, param) => {
+  // console.log(
+  //   'cmd: ', cmd, '\n',
+  //   'params: ', param, '\n',
+  //   'sk', program.sk, '\n',
+  //   'token', program.token, '\n',
+  //   'count', program.count, '\n',
+  //   'debug', program.debug, '\n'
+  // );
+  //
+  // process.exit(0);
+
+  // dispatch actions
+  if (!_.contains(acceptCmds, cmd)) {
+    console.error('Unknown cmd, only support: ' + acceptCmds.join(', '));
     process.exit(1);
   }
-  if (!program.sk) {
-    console.error('no sk given');
-    process.exit(1);
-  }
-  if (!program.token) {
-    console.error('no token given');
-    process.exit(1);
-  }
 
-  debug && showMsg('handle query: ', query, '\n');
-  let agent = require('./agent').instance({
-    sk: program.sk,
-    token: program.token,
-    query: query,
-    debug: debug
-  });
-
-  agent.run();
+  actions[cmd](param);
 });
 
 program.parse(process.argv);
