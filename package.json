@@ -23,10 +23,13 @@
   "keywords": [
     "qingcloud",
     "cluster",
+    "vm config",
     "json schema",
+    "json mustache",
     "mustache",
     "toml",
-    "translator"
+    "translator",
+    "config parser"
   ],
   "author": "sunnyw",
   "license": "MIT",
@@ -35,20 +38,26 @@
   },
   "homepage": "https://github.com/iwisunny/cluster-schema-translator#readme",
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
+    "@babel/core": "7.0.0-beta.54",
+    "@babel/plugin-external-helpers": "7.0.0-beta.54",
+    "@babel/preset-env": "7.0.0-beta.54",
+    "babel-core": "^7.0.0-bridge.0",
     "eslint": "^4.18.2",
     "jest": "^22.4.3",
     "prettier": "^1.11.1",
     "rimraf": "^2.6.2",
     "rollup": "^0.57.0",
-    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-babel": "^4.0.0-beta.2",
+    "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-globals": "^1.2.0",
     "rollup-plugin-node-resolve": "^3.3.0"
   },
   "engines": {
     "node": ">=4.8"
   },
   "dependencies": {
+    "chalk": "^2.3.2",
     "commander": "^2.15.1",
     "js-yaml": "^3.11.0",
     "superagent": "^3.8.2",

@@ -4,6 +4,7 @@
 const request = require('superagent');
 const _ = require('underscore');
 const describe = require('./Describe');
+const logger=require('./logger');
 
 const userAgent =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko)\
@@ -11,9 +12,9 @@ const userAgent =
 
 const header = {
   Accept: 'application/json, */*; q=0.8',
-  'Cache-Control': 'no-cache',
-  Pragma: 'no-cache',
-  Connection: 'keep-alive',
+  // 'Cache-Control': 'no-cache',
+  // Pragma: 'no-cache',
+  // Connection: 'keep-alive',
   'Content-Type': 'application/x-www-form-urlencoded',
   'User-Agent': userAgent,
   'X-Requested-With': 'XMLHttpRequest'
@@ -99,23 +100,20 @@ class Agent {
     });
   }
 
-  info(...msg) {
-    console.log('[INFO] ', ...msg);
-  }
-
   run(cb) {
     let reqUrl = this.getRequestUrl(),
       reqHeader = this.getHeader();
 
     if (this.debug) {
-      this.info('request url: ', reqUrl);
-      this.info('request header: ', JSON.stringify(reqHeader));
+      logger.info('request url: ', reqUrl);
+      logger.info('request header: ', JSON.stringify(reqHeader));
     }
 
     let req = request
       .post(reqUrl)
+      .retry(0) // no need retry
       .timeout({
-        response: this.query === 'all' ? 20000 : 10000
+        response: this.query === 'all' ? 15000 : 5000
       })
       .set(reqHeader);
 
@@ -145,7 +143,7 @@ class Agent {
 
     if (this.queryType === 'ca') {
       let reqBody = describe.attachment.getQueryParams(_.pick(this, ['zone', 'ca', 'limit']));
-      this.debug && this.info('request params: ', JSON.stringify(reqBody), '\n');
+      this.debug && logger.info('request params: ', JSON.stringify(reqBody), '\n');
       fetchAttachment(reqBody);
     } else {
       let describeModule = this.queryType === 'appv' ? describe.appVer : describe.app;

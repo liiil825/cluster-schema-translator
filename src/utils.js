@@ -47,8 +47,8 @@ module.exports = {
       } else {
         // show schema content
         countSaved++; // incr counter
-        console.log('[INFO]', path.basename(schema.filename));
-        console.log(schema.content);
+        console.log('\n[INFO]', path.basename(schema.filename));
+        console.log({raw: schema.content});
       }
     };
 
@@ -90,7 +90,7 @@ module.exports = {
       console.warn('invalid schema file: ', path.basename(file));
       return;
     }
-    schema = typeof schema === 'object' ? JSON.stringify(schema, null, 4) : schema.toString();
+    schema = typeof schema === 'object' ? JSON.stringify(schema) : schema.toString();
 
     return {
       filename: file,

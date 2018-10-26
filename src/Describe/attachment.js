@@ -2,7 +2,7 @@ module.exports = {
   action: 'DescribeCommonAttachments',
   getQueryParams: function(options) {
     let limit;
-    if (options.limit) {
+    if (options.limit >= 0) {
       limit = options.limit;
     } else {
       limit = options.ca ? 50 : 100;
